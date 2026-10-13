@@ -3,7 +3,7 @@ using Partners.Domain.Common;
 
 namespace Partners.Domain.Partners;
 
-public sealed class Partner
+public sealed class Partner : BaseEntity
 {
     public const int NameMinLength = 2;
     public const int NameMaxLength = 100;
@@ -11,16 +11,12 @@ public sealed class Partner
     public const decimal CreditLimitMin = 0m;
     public const decimal CreditLimitMax = 1_000_000m;
 
-    public Guid Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string TaxNumber { get; private set; } = string.Empty;
     public PartnerType Type { get; private set; }
     public string? Email { get; private set; }
     public decimal CreditLimit { get; private set; }
     public bool IsActive { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
-    public byte[] RowVersion { get; private set; } = [];
 
     // Required by EF Core to materialize entities from the database.
     private Partner() { }
@@ -31,7 +27,7 @@ public sealed class Partner
     {
         var values = Validate(name, taxNumber, type, email, creditLimit);
 
-        return new Partner
+        var partner = new Partner
         {
             Id = Guid.NewGuid(),
             Name = values.Name,
@@ -39,10 +35,11 @@ public sealed class Partner
             Type = type,
             Email = values.Email,
             CreditLimit = creditLimit,
-            IsActive = true,
-            CreatedAt = utcNow,
-            UpdatedAt = utcNow
+            IsActive = true
         };
+        partner.MarkAsCreated(utcNow);
+
+        return partner;
     }
 
     public void Update(
@@ -58,7 +55,8 @@ public sealed class Partner
         Email = values.Email;
         CreditLimit = creditLimit;
         IsActive = isActive;
-        UpdatedAt = utcNow;
+
+        MarkAsUpdated(utcNow);
     }
 
     private static ValidatedValues Validate(
