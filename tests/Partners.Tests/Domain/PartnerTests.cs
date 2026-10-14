@@ -36,7 +36,6 @@ public sealed class PartnerTests
     [Theory]
     [InlineData(0)]
     [InlineData(10.99)]
-    [InlineData(10.990)]
     [InlineData(1000000)]
     public void Create_AcceptsCreditLimitsWithinRules(decimal creditLimit)
     {
