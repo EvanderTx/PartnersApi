@@ -12,8 +12,8 @@ using Partners.Infrastructure.Persistence;
 namespace Partners.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261014111818_InitialCreat")]
-    partial class InitialCreat
+    [Migration("20261014123141_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
