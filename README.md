@@ -52,7 +52,7 @@ As dependências apontam para dentro: `Api → Application/Infrastructure → Do
 dotnet run --project src/Partners.Api --launch-profile http
 ```
 
-A API fica disponível em `http://localhost:5018`. O documento OpenAPI está em `http://localhost:5018/openapi/v1.json` (ambiente Development).
+A API fica disponível em `http://localhost:5018`. Em ambiente Development, o Swagger UI está em `http://localhost:5018/swagger` (para testar os endpoints no navegador) e o documento OpenAPI em `http://localhost:5018/openapi/v1.json`.
 
 Exemplos HTTP prontos a usar estão em [`src/Partners.Api/Partners.Api.http`](src/Partners.Api/Partners.Api.http) (Visual Studio, Rider ou a extensão REST Client do VS Code).
 

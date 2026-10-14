@@ -12,11 +12,15 @@ var connectionString = builder.Configuration.GetConnectionString("PartnersDb")
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(connectionString);
 
+// Enums travel as "CUSTOMER", "SUPPLIER" or "BOTH"; numeric values are rejected.
+var enumConverter = new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseUpper, allowIntegerValues: false);
+
 builder.Services.AddControllers(options =>
         options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
-    .AddJsonOptions(options =>
-        options.JsonSerializerOptions.Converters.Add(
-            new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseUpper, allowIntegerValues: false)));
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(enumConverter));
+
+// The OpenAPI document reads these options, so the schema shows the same enum values as the API.
+builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(enumConverter));
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -29,6 +33,7 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Partners API v1"));
 }
 
 app.UseHttpsRedirection();
