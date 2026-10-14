@@ -1,6 +1,88 @@
-@Partners.Api_HostAddress = http://localhost:5018
+@baseUrl = http://localhost:5018
+@partnerId = 8f1c2a10-0000-4000-8000-000000000001
 
-GET {{Partners.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Create a customer (Name is trimmed, TaxNumber is normalized to 001234567)
+POST {{baseUrl}}/api/partners
+Content-Type: application/json
 
-###
+{
+  "name": " Ana Silva ",
+  "taxNumber": "001.234.567",
+  "type": "CUSTOMER",
+  "email": "ana.silva@example.com",
+  "creditLimit": 1500.50
+}
+
+### Same TaxNumber with another representation -> 409 Conflict
+POST {{baseUrl}}/api/partners
+Content-Type: application/json
+
+{
+  "name": "Ana Duplicada",
+  "taxNumber": "001 234 567",
+  "type": "SUPPLIER",
+  "creditLimit": 0
+}
+
+### Invalid data (letters in TaxNumber, 3 decimal places) -> 400 Bad Request
+POST {{baseUrl}}/api/partners
+Content-Type: application/json
+
+{
+  "name": "Invalid Partner",
+  "taxNumber": "12345678A",
+  "type": "CUSTOMER",
+  "creditLimit": 10.999
+}
+
+### Get by Id (seeded partner)
+GET {{baseUrl}}/api/partners/{{partnerId}}
+
+### Get by Id that does not exist -> 404 Not Found
+GET {{baseUrl}}/api/partners/00000000-0000-0000-0000-000000000000
+
+### List with defaults (active only, Page=1, PageSize=20)
+GET {{baseUrl}}/api/partners
+
+### List customers (CUSTOMER + BOTH), including inactive
+GET {{baseUrl}}/api/partners?Type=CUSTOMER&IncludeInactive=true
+
+### Search by name (case-insensitive)
+GET {{baseUrl}}/api/partners?Search=ana
+
+### Search by TaxNumber with separators
+GET {{baseUrl}}/api/partners?Search=500.000
+
+### Combined filters and paging
+GET {{baseUrl}}/api/partners?Type=SUPPLIER&Search=a&Page=1&PageSize=1
+
+### Invalid paging -> 400 Bad Request
+GET {{baseUrl}}/api/partners?Page=0
+
+### Update (copy the Version returned by the GET by Id). isActive=false deactivates.
+PUT {{baseUrl}}/api/partners/{{partnerId}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Mendes",
+  "taxNumber": "500000001",
+  "type": "BOTH",
+  "email": null,
+  "creditLimit": 7500.00,
+  "isActive": true,
+  "version": "REPLACE_WITH_CURRENT_VERSION"
+}
+
+### Update with a malformed Version -> 400 Bad Request
+PUT {{baseUrl}}/api/partners/{{partnerId}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Mendes",
+  "taxNumber": "500000001",
+  "type": "CUSTOMER",
+  "email": null,
+  "creditLimit": 5000.00,
+  "isActive": true,
+  "version": "not-a-version"
+}

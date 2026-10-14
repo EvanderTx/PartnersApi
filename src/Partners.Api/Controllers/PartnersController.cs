@@ -7,7 +7,6 @@ namespace Partners.Api.Controllers;
 
 [ApiController]
 [Route("api/partners")]
-[Produces("application/json")]
 public sealed class PartnersController(PartnerService partnerService) : ControllerBase
 {
     [HttpPost]
